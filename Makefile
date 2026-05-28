@@ -18,4 +18,4 @@ clean:
 # Deploy to Google Play Store using Fastlane
 deploy-play:
 	@echo "Deploying to Google Play Store..."
-	@bundle exec fastlane android deploy
+	@cd android && bundle exec fastlane android deploy

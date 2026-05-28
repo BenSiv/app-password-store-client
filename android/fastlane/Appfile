@@ -1,8 +1,8 @@
-# fastlane/Appfile
+# android/fastlane/Appfile
 # This file stores common configuration information for fastlane.
 
 # The package name of your Android app
 package_name("com.bensivan.passwordstore")
 
-# Path to the google-services.json file (optional if you use the JSON key file instead)
-json_key_file("cfg/google-play-key.json")
+# Path to the Google Play key relative to the android/ folder
+json_key_file("configs/google-play-key.json")
