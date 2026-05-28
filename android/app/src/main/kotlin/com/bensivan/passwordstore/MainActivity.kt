@@ -1,4 +1,4 @@
-package net.okadan.passwordstoreclient
+package com.bensivan.passwordstore
 
 import io.flutter.embedding.android.FlutterActivity
 

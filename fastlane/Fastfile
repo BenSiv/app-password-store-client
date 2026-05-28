@@ -1,0 +1,24 @@
+# fastlane/Fastfile
+# This file defines the lanes (automation pipelines) for fastlane.
+
+default_platform(:android)
+
+platform :android do
+  desc "Deploy a new version to the Google Play Store"
+  lane :deploy do
+    # 1. Build the production App Bundle (AAB) using Flutter
+    sh("flutter build appbundle --release")
+
+    # 2. Upload the AAB and Metadata to Google Play
+    supply(
+      package_name: "com.bensivan.passwordstore",
+      json_key: "cfg/google-play-key.json",
+      track: "internal", # Options: production, beta, alpha, internal
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs: true
+    )
+  end
+end
