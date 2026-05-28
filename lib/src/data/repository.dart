@@ -51,6 +51,42 @@ final class Repository {
   static Repository get instance => _instance ??= Repository._();
   final SubscriptionManager _subscriptionManager = SubscriptionManager();
 
+  Future<Map<String, String>?> _loadIndex() async {
+    final repoDir = Directory('${(await getApplicationDocumentsDirectory()).path}/git-repository');
+    final indexFile = File('${repoDir.path}/index.gpg');
+    if (!indexFile.existsSync()) {
+      return null;
+    }
+
+    final privateKey = await FlutterSecureStorage().read(key: 'gpg-key');
+    final passphrase = await FlutterSecureStorage().read(key: 'gpg-key-passphrase');
+    if (privateKey == null) {
+      return null;
+    }
+
+    try {
+      final decryptedBytes = await OpenPGP.decryptBytes(indexFile.readAsBytesSync(), privateKey, passphrase ?? '');
+      final decryptedText = utf8.decode(decryptedBytes);
+      final lines = decryptedText.trim().split(RegExp(r'\r?\n'));
+      final Map<String, String> mappings = {};
+      for (var line in lines) {
+        line = line.trim();
+        if (line.isEmpty) continue;
+        final colonIdx = line.indexOf(':');
+        if (colonIdx >= 0) {
+          final key = line.substring(0, colonIdx).trim();
+          final val = line.substring(colonIdx + 1).trim();
+          if (key != '__salt__') {
+            mappings[key] = val;
+          }
+        }
+      }
+      return mappings;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Stream<Iterable<String>> subscribeVaultList() {
     return _subscriptionManager.createStream(() async {
       final repoDir = Directory('${(await getApplicationDocumentsDirectory()).path}/git-repository');
@@ -70,8 +106,13 @@ final class Repository {
         throw 'GPG key missing from .gpg-id: keyId=$keyId';
       }
 
+      final indexMappings = await _loadIndex();
+      if (indexMappings != null) {
+        return indexMappings.keys.toList()..sort((a, b) => a.compareTo(b));
+      }
+
       return repoDir.listSync(recursive: true)
-        .where((e) => e.path.endsWith('.gpg'))
+        .where((e) => e.path.endsWith('.gpg') && !e.path.endsWith('index.gpg'))
         .map((e) => e.path.split('${repoDir.path}/').last.split('.gpg').first)
         .toList()..sort((a, b) => a.compareTo(b));
     });
@@ -79,7 +120,16 @@ final class Repository {
 
   Stream<Vault> subscribeVaultDetail(String path) {
     return _subscriptionManager.createStream(() async {
-      final file = File('${(await getApplicationDocumentsDirectory()).path}/git-repository/$path.gpg');
+      final repoDir = Directory('${(await getApplicationDocumentsDirectory()).path}/git-repository');
+      File file;
+
+      final indexMappings = await _loadIndex();
+      if (indexMappings != null && indexMappings.containsKey(path)) {
+        final hashName = indexMappings[path];
+        file = File('${repoDir.path}/$hashName.gpg');
+      } else {
+        file = File('${repoDir.path}/$path.gpg');
+      }
 
       if (!file.existsSync()) {
         throw 'Vault not found: path=$path';

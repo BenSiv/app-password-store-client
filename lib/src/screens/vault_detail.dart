@@ -33,7 +33,7 @@ final class _VaultDetailScreenState extends State<VaultDetailScreen> {
               child: Column(
                 spacing: 16,
                 children: [
-                  _VaultField(label: 'Vault', value: vault.vault),
+                  _VaultField(label: 'Vault', value: vault.vault, isPassword: true),
                   if (vault.username.isNotEmpty)
                     _VaultField(label: 'Username', value: vault.username),
                   ...vault.websites.map((e) =>
@@ -51,11 +51,17 @@ final class _VaultDetailScreenState extends State<VaultDetailScreen> {
 }
 
 final class _VaultField extends StatefulWidget {
-  const _VaultField({required this.label, required this.value});
+  const _VaultField({
+    required this.label,
+    required this.value,
+    this.isPassword = false,
+  });
 
   final String label;
 
   final String value;
+
+  final bool isPassword;
 
   @override
   State<StatefulWidget> createState() {
@@ -64,23 +70,53 @@ final class _VaultField extends StatefulWidget {
 }
 
 final class _VaultFieldState extends State<_VaultField> {
+  late bool _obscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscured = widget.isPassword;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayValue = widget.isPassword && _obscured
+        ? '•' * widget.value.length
+        : widget.value;
+
     return InputDecorator(
       decoration: InputDecoration(
         labelText: widget.label,
         suffixIconConstraints: BoxConstraints(),
         suffixIcon: IntrinsicWidth(
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              InkWell(
-                child: Icon(Icons.copy),
-                onTap: () async {
+              if (widget.isPassword) ...[
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  icon: Icon(
+                    _obscured ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscured = !_obscured;
+                    });
+                  },
+                ),
+                SizedBox(width: 12),
+              ],
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(),
+                icon: Icon(Icons.copy),
+                onPressed: () async {
                   await Clipboard.setData(
                     ClipboardData(text: widget.value),
                   );
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context) .showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Copied ${widget.label}!')),
                   );
                 },
@@ -89,7 +125,12 @@ final class _VaultFieldState extends State<_VaultField> {
           ),
         ),
       ),
-      child: Text(widget.value),
+      child: Text(
+        displayValue,
+        style: widget.isPassword && _obscured
+            ? TextStyle(fontSize: 16, letterSpacing: 2)
+            : null,
+      ),
     );
   }
 }
