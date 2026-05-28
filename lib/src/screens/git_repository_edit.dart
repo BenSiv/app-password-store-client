@@ -135,21 +135,20 @@ final class _GitRepositoryEditScreenState extends State<_GitRepositoryEditScreen
                   labelText: 'Credential',
                   helperText: '',
                 ),
-                child: RadioGroup<int>(
-                  groupValue: _credentialType,
-                  onChanged: (value) => setState(() => _credentialType = value!),
-                  child: Transform.translate(
-                    offset: Offset(-12, 0),
-                    child: Row(
-                      spacing: 8,
-                      children: ['None', 'Password'].asMap().entries.map((e) => Row(
-                        children: [
-                          Radio(value: e.key, visualDensity: VisualDensity.compact),
-                          Text(e.value),
-                        ],
-                      )).toList(),
-                    ),
-                  ),
+                child: Row(
+                  children: ['None', 'Password'].asMap().entries.map((e) => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Radio<int>(
+                        value: e.key,
+                        groupValue: _credentialType,
+                        onChanged: (value) => setState(() => _credentialType = value!),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      Text(e.value),
+                      SizedBox(width: 16),
+                    ],
+                  )).toList(),
                 ),
               ),
               if (_credentialType == 1) ...[

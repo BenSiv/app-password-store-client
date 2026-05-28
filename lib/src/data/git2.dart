@@ -53,7 +53,7 @@ final class GitRepository {
       throw 'GitCredential not found: key=$payloadKey';
     }
 
-    final credential = _credentialPayloads.remove(payloadKey);
+    final credential = _credentialPayloads[payloadKey];
     switch (credential) {
       case GitCredentialUserPass():
         final cUsername = credential.username.toNativeUtf8();
@@ -111,6 +111,9 @@ final class GitRepository {
       _handle(git_clone(cRepo, cUrl.cast(), cLocalPath.cast(), cOptions));
       return GitRepository._(cRepo.value);
     } finally {
+      if (cCredentialPayload.value != 0) {
+        _credentialPayloads.remove(cCredentialPayload.value);
+      }
       calloc.free(cRepo);
       calloc.free(cUrl);
       calloc.free(cLocalPath);

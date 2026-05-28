@@ -12,7 +12,7 @@ dependencies:
   built_value:
   dart_pg:
   ffi:
-  file_picker:
+  file_picker: ^6.0.0
   flutter_secure_storage:
   git2: { git: https://github.com/okadan/app-password-store-client-git2 }
   go_router:
