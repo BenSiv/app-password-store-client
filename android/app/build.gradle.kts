@@ -61,6 +61,10 @@ kotlin {
     }
 }
 
+dependencies {
+    implementation("androidx.biometric:biometric:1.1.0")
+}
+
 flutter {
     source = "../.."
 }

@@ -26,7 +26,9 @@ final class _GpgKeyScreenState extends State<GpgKeyScreen> {
 
     switch (value) {
       case 'file':
-        final result = await FilePicker.platform.pickFiles();
+        final result = await Repository.instance.runWithAutoLockSuspended(
+          () => FilePicker.platform.pickFiles(),
+        );
         if (result == null) return;
         try {
           armored = await result.xFiles.first.readAsString();
@@ -206,6 +208,7 @@ final class _EnterPassphraseDialogState extends State<_EnterPassphraseDialog> {
   final _formKey = GlobalKey<FormState>();
   var _autovalidateMode = AutovalidateMode.disabled;
   final _passphraseController = TextEditingController();
+  bool _obscured = true;
   String? _errorMessage;
 
   @override
@@ -248,9 +251,16 @@ final class _EnterPassphraseDialogState extends State<_EnterPassphraseDialog> {
             SizedBox(height: 12),
             TextFormField(
               controller: _passphraseController,
+              obscureText: _obscured,
+              enableSuggestions: false,
+              autocorrect: false,
               decoration: InputDecoration(
                 labelText: 'Passphrase',
                 helperText: '',
+                suffixIcon: IconButton(
+                  icon: Icon(_obscured ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => _obscured = !_obscured),
+                ),
               ),
               validator: (value) {
                 return FormFieldValidators.isRequired(value) ?? _errorMessage;

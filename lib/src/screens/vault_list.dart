@@ -15,6 +15,21 @@ final class _VaultListScreenState extends State<VaultListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Vaults'),
+        actions: [
+          ListenableBuilder(
+            listenable: Repository.instance.lockStateListenable,
+            builder: (context, _) {
+              if (!Repository.instance.isAppLockEnabled) {
+                return const SizedBox.shrink();
+              }
+              return IconButton(
+                tooltip: 'Lock Vault',
+                icon: const Icon(Icons.lock_outline),
+                onPressed: Repository.instance.lock,
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: StreamBuilder<Iterable<String>>(

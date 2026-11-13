@@ -27,6 +27,10 @@ dev_dependencies:
   dart_mappable_builder:
   flutter_launcher_icons:
   flutter_lints:
+  flutter_secure_storage_platform_interface:
+  flutter_test:
+    sdk: flutter
+  path_provider_platform_interface:
 
 flutter:
   uses-material-design: true

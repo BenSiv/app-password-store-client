@@ -43,26 +43,36 @@ final class _SettingsScreenState extends State<SettingsScreen> {
         title: Text('Settings'),
       ),
       body: SafeArea(
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text('Git Repository'),
-              onTap: () => context.go('/settings/git-repository'),
-            ),
-            ListTile(
-              title: Text('GPG Key'),
-              onTap: () => context.go('/settings/gpg-key'),
-            ),
-            ListTile(
-              title: Text('Privacy Policy'),
-              onTap: () => launchUrlString('https://docs.google.com/document/d/e/2PACX-1vRTCnm5Ry2T1MAh8EK8ge0QH4eByt6MjQzJf6Ixdg9SqTl5cjqpu44Di1cM1-NUtTN7_vSNvJ1KFL8v/pub'),
-            ),
-            ListTile(
-              title: Text('Reset App'),
-              textColor: ColorScheme.of(context).error,
-              onTap: _handleResetApp,
-            ),
-          ],
+        child: ListenableBuilder(
+          listenable: Repository.instance.lockStateListenable,
+          builder: (context, _) {
+            return ListView(
+              children: [
+                ListTile(
+                  title: Text('Git Repository'),
+                  onTap: () => context.go('/settings/git-repository'),
+                ),
+                ListTile(
+                  title: Text('GPG Key'),
+                  onTap: () => context.go('/settings/gpg-key'),
+                ),
+                ListTile(
+                  title: Text('App Lock & Security'),
+                  subtitle: Text(Repository.instance.appLockMode.label),
+                  onTap: () => context.go('/settings/security'),
+                ),
+                ListTile(
+                  title: Text('Privacy Policy'),
+                  onTap: () => launchUrlString('https://docs.google.com/document/d/e/2PACX-1vRTCnm5Ry2T1MAh8EK8ge0QH4eByt6MjQzJf6Ixdg9SqTl5cjqpu44Di1cM1-NUtTN7_vSNvJ1KFL8v/pub'),
+                ),
+                ListTile(
+                  title: Text('Reset App'),
+                  textColor: ColorScheme.of(context).error,
+                  onTap: _handleResetApp,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -77,7 +87,8 @@ final class _ResetAppConfirmDialog extends StatelessWidget {
       content: Text(
         'This action will delete the following data from your device and restore the app to its default state:\n\n'
         '- Git Repository\n'
-        '- GPG Key',
+        '- GPG Key\n'
+        '- App Lock & Biometric Keys',
       ),
       actions: [
         TextButton(

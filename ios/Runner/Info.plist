@@ -6,6 +6,8 @@
 	<string>This app requires location access to optimize your experience.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to allow you to attach photos.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Authenticate with Face ID to unlock your GPG-encrypted password store.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

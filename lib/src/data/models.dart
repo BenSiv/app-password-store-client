@@ -5,6 +5,26 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
 part 'models.mapper.dart';
 
+enum AppLockMode {
+  off('off', 'Off'),
+  masterPassword('masterPassword', 'GPG Passphrase'),
+  biometric('biometric', 'Strong Biometrics + GPG Passphrase');
+
+  const AppLockMode(this.storageValue, this.label);
+
+  final String storageValue;
+  final String label;
+
+  static AppLockMode fromStorage(String? raw) {
+    for (final mode in AppLockMode.values) {
+      if (mode.storageValue == raw) {
+        return mode;
+      }
+    }
+    return AppLockMode.off;
+  }
+}
+
 @MappableClass(discriminatorKey: 'type')
 sealed class GitCredential with GitCredentialMappable {
   const GitCredential();

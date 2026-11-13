@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:app/src/data/models.dart';
 import 'package:app/src/data/repository.dart';
+import 'package:app/src/utils/platform_security.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 
 final class VaultDetailScreen extends StatefulWidget {
@@ -127,14 +127,12 @@ final class _VaultFieldState extends State<_VaultField> {
                 constraints: BoxConstraints(),
                 icon: Icon(Icons.copy),
                 onPressed: () async {
-                  await Clipboard.setData(
-                    ClipboardData(text: widget.value),
-                  );
+                  await PlatformSecurity.copySensitive(widget.value);
                   if (!context.mounted) return;
                   final messenger = ScaffoldMessenger.of(context);
                   messenger.clearSnackBars();
                   messenger.showSnackBar(
-                    SnackBar(content: Text('Copied ${widget.label}')),
+                    SnackBar(content: Text('Copied ${widget.label} (clears in 45s)')),
                   );
                 },
               ),
