@@ -1,5 +1,7 @@
 # Password Store Client Makefile
 
+.PHONY: build-local build clean deploy-play
+
 # Build local debug APK
 build-local:
 	@echo "Building local Android debug APK..."
