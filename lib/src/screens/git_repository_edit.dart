@@ -81,9 +81,9 @@ final class _GitRepositoryEditScreenState extends State<_GitRepositoryEditScreen
       await Repository.instance.syncAndSaveGitRepository(
         url: _urlController.text,
         branch: _branchController.text,
-        credential: _credentialType == 0 ? null : GitCredentialUserPass((b) => b
-          ..username = _usernameController.text
-          ..password = _passwordController.text,
+        credential: _credentialType == 0 ? null : GitCredentialUserPass(
+          username: _usernameController.text,
+          password: _passwordController.text,
         ),
       );
     } catch (e) {

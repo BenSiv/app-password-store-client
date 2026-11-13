@@ -2,7 +2,7 @@ import 'package:app/src/data/repository.dart';
 import 'package:app/src/utils/form_field_validators.dart';
 import 'package:app/src/utils/logger.dart';
 import 'package:app/src/utils/show_error_dialog.dart';
-import 'package:dart_pg/dart_pg.dart' as dart_pg;
+import 'package:dart_pg/dart_pg.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,7 +93,7 @@ final class _GpgKeyScreenState extends State<GpgKeyScreen> {
         ],
       ),
       body: SafeArea(
-        child: StreamBuilder<dart_pg.PrivateKey>(
+        child: StreamBuilder<PrivateKey>(
           stream: Repository.instance.subscribeGpgPrivateKey(),
           builder: (context, ss) {
             if (ss.hasError) return Center(child: Text('${ss.error}'));
@@ -144,8 +144,8 @@ final class _GpgKeyScreenState extends State<GpgKeyScreen> {
   }
 }
 
-// `dart_pg.PrivateKey.expirationTime` seems to be null, so use the earliest expirationTime among the subkeys instead.
-DateTime? _getExpirationTime(dart_pg.PrivateKey privateKey) {
+// `PrivateKey.expirationTime` seems to be null, so use the earliest expirationTime among the subkeys instead.
+DateTime? _getExpirationTime(PrivateKey privateKey) {
   if (privateKey.expirationTime != null) {
     return privateKey.expirationTime;
   }
